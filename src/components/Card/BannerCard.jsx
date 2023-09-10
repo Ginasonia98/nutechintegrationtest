@@ -6,9 +6,9 @@ import Banner5 from "../../assets/image/Banner5.png";
 
 const BannerCard = () => {
   return (
-    <div className="h-64 border border-black bg-blue-200 p-4">
+    <div className="h-64 mt-5 p-4 overflow-x-auto">
       <h3 className="text-lg font-semibold mb-4">Temukan Promo Menarik</h3>
-      <div className="flex justify-between gap-4">
+      <div className="flex flex-nowrap gap-4">
         <div className="flex-shrink-0">
           <img src={Banner1} alt="Banner 1" />
         </div>
@@ -30,3 +30,4 @@ const BannerCard = () => {
 };
 
 export default BannerCard;
+

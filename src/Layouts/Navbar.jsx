@@ -20,17 +20,17 @@ const Navbar = () => {
             </Link>
           </div>
           <div className="hidden md:flex space-x-4">
-            <Link to="/topup" className="text-gray-800 hover:text-red-600">
+            <Link to="/topup" className="text-gray-800">
               Top Up
             </Link>
             <Link
               to="/transaction"
-              className="text-gray-800 hover:text-red-600"
+              className="text-gray-800"
             >
               Transaction
             </Link>
-            <Link to="/profile" className="text-gray-800 hover:text-red-600">
-              Akun
+            <Link to="/profile" className="text-gray-800">
+              Account
             </Link>
           </div>
           <div className="md:hidden flex items-center">
@@ -69,21 +69,21 @@ const Navbar = () => {
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <Link
               to="/topup"
-              className="text-gray-800 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 hover:text-red-600"
+              className="text-gray-800 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100"
             >
               Top Up
             </Link>
             <Link
               to="/transaction"
-              className="text-gray-800 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 hover:text-red-600"
+              className="text-gray-800 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100"
             >
               Transaction
             </Link>
             <Link
               to="/profile"
-              className="text-gray-800 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 hover:text-red-600"
+              className="text-gray-800 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100"
             >
-              Akun
+              Account
             </Link>
           </div>
         </div>
@@ -93,4 +93,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

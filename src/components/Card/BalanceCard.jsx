@@ -19,7 +19,7 @@ const BalanceCard = (props) => {
   return (
     <div className="relative">
       <img src={BackgroundSaldo} alt="Background Banner Saldo" />
-      <div className="absolute flex flex-col gap-[24px] mt-[-150px] ml-3 h-[130px]">
+      <div className="absolute flex flex-col gap-[24px] mt-[-140px] ml-3 h-[120px]">
         <p className="text-white font-light text-sm">Saldo Anda</p>
         <p className="text-2xl text-white font-bold">RP. {saldoText}</p>
         <p
@@ -38,3 +38,4 @@ BalanceCard.propTypes = {
 };
 
 export default BalanceCard;
+

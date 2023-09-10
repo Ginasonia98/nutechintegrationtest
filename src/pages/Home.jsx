@@ -60,11 +60,15 @@ const Home = () => {
   return (
     <>
       <Navbar />
-      <div className="flex justify-between px-4 md:px-48 mt-4">
+      <div className="flex flex-col md:flex-row md:space-x-4 px-4 md:px-48 ">
         <CardName name={`${user?.first_name || ""} ${user?.last_name || ""}`} />
-        <CardSaldo saldo={saldo?.balance || 0} />
+        <div className="md:space-x-0 mt-10">
+          <CardSaldo saldo={saldo?.balance || 0} />
+        </div>
       </div>
+      <div className="mt-10">
       <CardLayanan />
+      </div>
       <CardBanner />
     </>
   );

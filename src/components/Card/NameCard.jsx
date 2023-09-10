@@ -6,15 +6,17 @@ const NameCard = (props) => {
   const { name } = props;
   
   return (
-    <div className="flex items-center">
-      <div className="pl-2">
+    <div className="flex items-center justify-center md:justify-start">
+      <div className="md:flex md:items-center md:space-x-4">
         <img
           className="w-40 h-32 pt-5"
           src={ProfilePhoto}
           alt="Profile Photo"
         />
-        <p className="text-black">Selamat datang,</p>
-        <h1 className="text-3xl font-semibold">{name}</h1>
+        <div>
+          <p className="text-black text-center md:text-left">Welcome,</p>
+          <h1 className="text-3xl font-semibold text-center md:text-left">{name}</h1>
+        </div>
       </div>
     </div>
   );
@@ -25,3 +27,4 @@ NameCard.propTypes = {
 };
 
 export default NameCard;
+

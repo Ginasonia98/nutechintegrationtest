@@ -1,8 +1,14 @@
 import fotoProfile from "../../assets/image/ProfilePhoto.png";
 import { useAppSelector } from "../../services/hooks";
+import { useNavigate } from "react-router-dom";
 
 const FormProfile = () => {
   const user = useAppSelector((state) => state.user.user);
+  const navigate = useNavigate(); 
+
+  const handleLogout = () => {
+    navigate("/login"); // Gunakan navigate untuk mengarahkan ke halaman login
+  };
 
   return (
     <div className="flex flex-col justify-center items-center mt-4">
@@ -60,10 +66,10 @@ const FormProfile = () => {
             placeholder="Masukkan Nama Belakang Anda"
           />
         </div>
-        <button className="rounded w-full py-2 px-3 mb-2 text-red-700 border-2 border-red-800 font-semibold hover:border-red-400">
+        <button className="rounded w-full py-2 px-3 text-white bg-red-500 font-semibold mb-2">
           Edit Profile
         </button>
-        <button className="rounded w-full py-2 px-3 text-white bg-red-500 hover:bg-red-800 font-semibold">
+        <button className="rounded w-full py-2 px-3 text-white bg-red-500 font-semibold" onClick={handleLogout}>
           Logout
         </button>
       </form>
@@ -72,3 +78,5 @@ const FormProfile = () => {
 };
 
 export default FormProfile;
+
+

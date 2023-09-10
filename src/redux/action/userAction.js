@@ -1,9 +1,9 @@
 const KEY = "Action";
 export function loadState(sufix) {
   try {
-    const intialUser = localStorage.getItem(`${sufix}_${KEY}`);
-    if (!intialUser) return undefined;
-    return JSON.parse(intialUser);
+    const initialUser = localStorage.getItem(`${sufix}_${KEY}`);
+    if (!initialUser) return undefined;
+    return JSON.parse(initialUser);
   } catch (e) {
     return undefined;
   }

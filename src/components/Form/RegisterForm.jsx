@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { API } from "../../services/API";
 import logo from "../../assets/image/Logo.png";
 import bannerLogin from "../../assets/image/bannerLogin.png"; // Import banner image
-import Notif from "../Notification/Notification";
+import Notif from "./Notification";
 
 const FormRegister = () => {
   const title = "Registrasi";
@@ -30,9 +30,31 @@ const FormRegister = () => {
     });
   };
 
+  const isEmailValid = (email) => {
+    // Regular expression for email validation
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    return emailRegex.test(email);
+  };
+
+  const isPasswordValid = (password) => {
+    // Check if password is at least 8 characters long
+    return password.length >= 8;
+  };
+
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
+
+      if (!isEmailValid(email) || !isPasswordValid(password)) {
+        // Email or password is not valid
+        setMessage(
+          <Notif
+            styles="flex items-center p-4 mb-4 text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
+            message="Email tidak valid atau password harus memiliki setidaknya 8 karakter."
+          />
+        );
+        return;
+      }
 
       // Create Configuration Content-type here ...
       // Content-type: application/json
@@ -49,8 +71,9 @@ const FormRegister = () => {
       const response = await API.post("registration", body, config);
       console.log(response);
 
-      // Notification
-      if (response.data.status === 0) {
+      // Check response status
+      if (response.status === 200) {
+        // Registration successful
         const alert = (
           <Notif
             message={response.data.message}
@@ -59,6 +82,7 @@ const FormRegister = () => {
         );
         setMessage(alert);
       } else {
+        // Registration failed
         const alert = (
           <Notif
             styles="flex items-center p-4 mb-4 text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
@@ -68,22 +92,27 @@ const FormRegister = () => {
         setMessage(alert);
       }
     } catch (error) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : "Terjadi kesalahan pada server.";
+
+      // Handle other errors
       const alert = (
         <Notif
           styles="flex items-center p-4 mb-4 text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
-          message={error.response.data.message}
+          message={errorMessage}
         />
       );
       setMessage(alert);
       console.log(error);
-      return;
     }
   };
 
   document.title = "SIMS PPOB | " + title;
   return (
     <div className="flex flex-col md:flex-row">
-      <div className="md:w-2/5 px-8 py-8 md:px-20 md:py-20">
+      <div className="md:w-2/5 px-8 py-8 md:px-20 overflow-hidden">
         <div className="flex justify-center items-center">
           <img src={logo} alt="logo" />
           <h4 className="pl-3 font-semibold">SIMS PPOB</h4>
@@ -92,88 +121,96 @@ const FormRegister = () => {
           <p className="font-bold text-xl">Lengkapi Data untuk</p>
           <p className="font-bold text-xl">membuat akun</p>
         </div>
-
         <form className="flex flex-col my-4" onSubmit={handleSubmit}>
           <div className="relative mb-4">
-            <input
-              className="w-full px-4 py-2 border focus:outline-none focus:border-black"
-              type="email"
-              name="email"
-              value={email}
-              onChange={handleChange}
-              placeholder="Masukkan Email Anda"
-            />
-            <MdOutlineAlternateEmail className="absolute mt-[-28px] ml-1" />
+            <div className="flex items-center">
+              <MdOutlineAlternateEmail className="mr-2 text-gray-500" />
+              <input
+                className="w-full px-4 py-2 border focus:outline-none focus:border-black"
+                type="email"
+                name="email"
+                value={email}
+                onChange={handleChange}
+                placeholder="Masukkan Email Anda"
+              />
+            </div>
           </div>
           <div className="relative mb-4">
-            <input
-              className="w-full px-4 py-2 border focus:outline-none focus:border-black"
-              type="text"
-              name="first_name"
-              value={first_name}
-              onChange={handleChange}
-              placeholder="Nama Depan"
-            />
-            <BiSolidUser className="absolute mt-[-28px] ml-1" />
-          </div>
-
-          <div className="relative mb-4">
-            <input
-              className="w-full px-4 py-2 border focus:outline-none focus:border-black"
-              type="text"
-              name="last_name"
-              value={last_name}
-              onChange={handleChange}
-              placeholder="Nama Belakang"
-            />
-            <BiSolidUser className="absolute mt-[-28px] ml-1" />
+            <div className="flex items-center">
+              <BiSolidUser className="mr-2 text-gray-500" />
+              <input
+                className="w-full px-4 py-2 border focus:outline-none focus:border-black"
+                type="text"
+                name="first_name"
+                value={first_name}
+                onChange={handleChange}
+                placeholder="Nama Depan"
+              />
+            </div>
           </div>
 
           <div className="relative mb-4">
-            <input
-              className="w-full px-4 py-2 border focus:outline-none focus:border-black"
-              type={visible ? "text" : "password"}
-              name="password"
-              value={password}
-              onChange={handleChange}
-              placeholder="Buat Password"
-            />
-            <MdLock className="absolute mt-[-28px] ml-1" />
-            <button
-              className="ml-[-30px] mt-2"
-              onClick={() => setVisible(!visible)}
-            >
-              {visible ? <AiOutlineEye /> : <AiOutlineEyeInvisible />}
-            </button>
+            <div className="flex items-center">
+              <BiSolidUser className="mr-2 text-gray-500" />
+              <input
+                className="w-full px-4 py-2 border focus:outline-none focus:border-black"
+                type="text"
+                name="last_name"
+                value={last_name}
+                onChange={handleChange}
+                placeholder="Nama Belakang"
+              />
+            </div>
+          </div>
+
+          <div className="relative mb-4">
+            <div className="flex items-center">
+              <MdLock className="mr-2 text-gray-500" />
+              <input
+                className="w-full px-4 py-2 border focus:outline-none focus:border-black pr-10"
+                type={visible ? "text" : "password"}
+                name="password"
+                value={password}
+                onChange={handleChange}
+                placeholder="Buat Password"
+              />
+              <button
+                className="absolute right-0 top-0 mt-2 mr-2"
+                onClick={() => setVisible(!visible)}
+              >
+                {visible ? <AiOutlineEye /> : <AiOutlineEyeInvisible />}
+              </button>
+            </div>
           </div>
           <div className="relative mb-4">
-            <input
-              className="w-full px-4 py-2 border focus:outline-none focus:border-black"
-              type={visible2 ? "text" : "password"}
-              placeholder="Konfirmasi Password"
-            />
-            <MdLock className="absolute mt-[-36px] ml-1" />
-            <button
-              className="ml-[-30px] mt-2"
-              onClick={() => setVisible2(!visible2)}
-            >
-              {visible2 ? <AiOutlineEye /> : <AiOutlineEyeInvisible />}
-            </button>
+            <div className="flex items-center">
+              <MdLock className="mr-2 text-gray-500" />
+              <input
+                className="w-full px-4 py-2 border focus:outline-none focus:border-black pr-10"
+                type={visible2 ? "text" : "password"}
+                placeholder="Konfirmasi Password"
+              />
+              <button
+                className="absolute right-0 top-0 mt-2 mr-2"
+                onClick={() => setVisible2(!visible2)}
+              >
+                {visible2 ? <AiOutlineEye /> : <AiOutlineEyeInvisible />}
+              </button>
+            </div>
           </div>
 
           <button
             className={`w-full px-3 py-2 rounded-[5px] ${
-              password.length < 8
+              !isPasswordValid(password) || !isEmailValid(email)
                 ? "bg-gray-200 text-black"
                 : "bg-red-800 hover:bg-red-600 text-white"
             } mt-4`}
             type="submit"
-            disabled={password.length < 8}
+            disabled={!isPasswordValid(password) || !isEmailValid(email)}
           >
             Registrasi
           </button>
         </form>
-
         <div className="w-full flex justify-center mt-5">
           <p>
             Sudah punya akun ? Login
@@ -182,12 +219,11 @@ const FormRegister = () => {
             </span>
           </p>
         </div>
-
         {message && message}
       </div>
-      <div className="md:flex-1">
+      <div className="md:flex-1 overflow-hidden">
         <img
-          className="h-[200px] md:h-[100vh] w-full object-cover"
+          className="w-full h-screen object-cover"
           src={bannerLogin}
           alt="banner Login"
         />
@@ -197,11 +233,5 @@ const FormRegister = () => {
 };
 
 export default FormRegister;
-
-
-
-
-
-
 
 

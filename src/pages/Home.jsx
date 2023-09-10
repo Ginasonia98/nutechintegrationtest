@@ -11,7 +11,6 @@ import CardName from "../components/Card/NameCard";
 import CardSaldo from "../components/Card/BalanceCard";
 import Navbar from "../Layouts/Navbar";
 
-
 const Home = () => {
   const title = "Home";
   document.title = "SIMS PPOB | " + title;
@@ -62,8 +61,8 @@ const Home = () => {
     <>
       <Navbar />
       <div className="flex justify-between px-4 md:px-48 mt-4">
-        <CardName name={`${user?.first_name} ${user?.last_name}`} />
-        <CardSaldo saldo={saldo?.balance} />
+        <CardName name={`${user?.first_name || ""} ${user?.last_name || ""}`} />
+        <CardSaldo saldo={saldo?.balance || 0} />
       </div>
       <CardLayanan />
       <CardBanner />

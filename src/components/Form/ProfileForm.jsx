@@ -1,14 +1,15 @@
-import React, { useState } from "react";
-import fotoProfile from "../../assets/image/ProfilePhoto.png";
-import { useAppSelector } from "../../services/hooks";
-import { useDispatch } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useAppSelector, useAppDispatch } from "../../services/hooks"; // Menggunakan useAppDispatch
 import { updateUser } from "../../redux/slices/userSlice";
-import { useNavigate } from "react-router-dom"; // Gunakan useNavigate
+import { useNavigate } from "react-router-dom";
+import axios from "axios"; // Import Axios untuk melakukan permintaan HTTP
+import { MdOutlineAlternateEmail } from "react-icons/md";
+import { BiSolidUser } from "react-icons/bi";
 
 const FormProfile = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch(); // Menggunakan useAppDispatch
   const user = useAppSelector((state) => state.user.user);
-  const navigate = useNavigate(); // Gunakan useNavigate
+  const navigate = useNavigate();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({
@@ -23,20 +24,61 @@ const FormProfile = () => {
     last_name: "",
   });
 
+  const [profileImage, setProfileImage] = useState(null);
+  const [photoUpdated, setPhotoUpdated] = useState(false);
+
+  useEffect(() => {
+    if (user?.profile_image) {
+      setProfileImage(user.profile_image);
+    }
+  }, [user]);
+
   const handleEdit = () => {
     setIsEditing(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (validateInputs()) {
-      dispatch(updateUser(editedUser)); // Panggil tindakan Redux untuk menyimpan perubahan
-      setIsEditing(false);
-      alert("Profil berhasil diperbarui"); // Tambahkan notifikasi berhasil
+      const formData = new FormData();
+      formData.append("profileImage", profileImage);
+
+      try {
+        // Ambil token JWT dari Redux store
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const token = useAppSelector((state) => state.token.token);
+
+        // Konfigurasi untuk permintaan PUT ke endpoint /profile/update
+        const config = {
+          method: "PUT",
+          url: "/profile/update", // Sesuaikan URL dengan backend Anda
+          data: formData,
+          headers: {
+            Authorization: `Bearer ${token}`, // Tambahkan token JWT ke header
+          },
+        };
+
+        // Lakukan permintaan PUT menggunakan Axios
+        const response = await axios(config);
+
+        if (response.status === 200) {
+          // Menggunakan updateUser dari Redux untuk memperbarui data pengguna
+          dispatch(updateUser(response.data.user));
+
+          setPhotoUpdated(true);
+          setIsEditing(false);
+          alert("Profil berhasil diperbarui");
+        } else {
+          console.error("Gagal memperbarui profil:", response.data.error);
+          alert("Gagal memperbarui profil. Silakan coba lagi.");
+        }
+      } catch (error) {
+        console.error("Gagal memperbarui profil:", error);
+        alert("Gagal memperbarui profil. Silakan coba lagi.");
+      }
     }
   };
 
   const handleCancel = () => {
-    // Reset nilai editedUser dengan data asli pengguna
     setEditedUser({
       email: user?.email || "",
       first_name: user?.first_name || "",
@@ -48,15 +90,16 @@ const FormProfile = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Anda dapat menambahkan logika pengolahan berkas gambar di sini
-      // Misalnya, Anda dapat menampilkan gambar yang dipilih atau mengunggahnya ke server
+      if (file.size <= 100 * 1024) {
+        setProfileImage(URL.createObjectURL(file));
+      } else {
+        alert("Ukuran gambar melebihi 100 KB. Harap pilih gambar lain.");
+      }
     }
   };
 
   const handleLogout = () => {
-    // Lakukan logika logout seperti menghapus data pengguna
-    // Setelah logout, alihkan pengguna ke halaman login
-    navigate("/login"); // Gunakan navigate untuk mengarahkan ke halaman login
+    navigate("/login");
   };
 
   const handleChange = (e) => {
@@ -75,7 +118,6 @@ const FormProfile = () => {
       last_name: "",
     };
 
-    // Validasi Email
     if (!editedUser.email || !editedUser.email.trim()) {
       errors.email = "Email harus diisi.";
       isValid = false;
@@ -86,13 +128,11 @@ const FormProfile = () => {
       isValid = false;
     }
 
-    // Validasi Nama Depan
     if (!editedUser.first_name || !editedUser.first_name.trim()) {
       errors.first_name = "Nama Depan harus diisi.";
       isValid = false;
     }
 
-    // Validasi Nama Belakang
     if (!editedUser.last_name || !editedUser.last_name.trim()) {
       errors.last_name = "Nama Belakang harus diisi.";
       isValid = false;
@@ -105,7 +145,21 @@ const FormProfile = () => {
   return (
     <div className="flex flex-col justify-center items-center mt-4">
       <div>
-        <img src={fotoProfile} alt="foto profil" />
+        <label
+          htmlFor="profileImage"
+          className="cursor-pointer text-blue-500 hover:underline"
+        >
+          <img
+            src={profileImage || "/path/to/your/default/profile/image.jpg"}
+            alt="foto profil"
+            style={{ maxWidth: "100px", width: "100%", height: "auto" }}
+          />
+        </label>
+        {photoUpdated && (
+          <p className="text-green-500 mt-2">
+            Foto profil berhasil diperbarui!
+          </p>
+        )}
         <h1 className="mt-2">Edit Photo</h1>
         <h1 className="text-xl font-semibold">
           {user?.first_name + " " + user?.last_name}
@@ -113,12 +167,6 @@ const FormProfile = () => {
       </div>
       <form className="w-1/3">
         <div className="mb-4">
-          <label
-            htmlFor="profileImage"
-            className="cursor-pointer text-blue-500 hover:underline"
-          >
-            Unggah Foto
-          </label>
           <input
             type="file"
             id="profileImage"
@@ -128,20 +176,15 @@ const FormProfile = () => {
             className="hidden"
           />
         </div>
-        <div className="mb-4">
-          <label
-            htmlFor="email"
-            className="block text-gray-700 font-bold mb-2"
-          >
-            Email:
-          </label>
+        <div className="mb-4 relative">
+          <MdOutlineAlternateEmail className="absolute left-3 top-2 h-5 w-5 text-gray-500" />
           <input
             type="email"
             id="email"
             name="email"
             value={editedUser.email}
             readOnly={!isEditing}
-            className={`border rounded w-full py-2 px-3 ${
+            className={`border rounded pl-10 w-full py-2 px-3 ${
               validationErrors.email ? "border-red-500" : ""
             }`}
             placeholder="Masukkan alamat email Anda"
@@ -151,20 +194,16 @@ const FormProfile = () => {
             <p className="text-red-500">{validationErrors.email}</p>
           )}
         </div>
-        <div className="mb-4">
-          <label
-            htmlFor="first_name"
-            className="block text-gray-700 font-bold mb-2"
-          >
-            Nama Depan:
-          </label>
+
+        <div className="mb-4 relative">
+          <BiSolidUser className="absolute left-3 top-2 h-5 w-5 text-gray-500" />
           <input
             type="text"
             id="first_name"
             name="first_name"
             value={editedUser.first_name}
             readOnly={!isEditing}
-            className={`border rounded w-full py-2 px-3 ${
+            className={`border rounded pl-10 w-full py-2 px-3 ${
               validationErrors.first_name ? "border-red-500" : ""
             }`}
             placeholder="Masukkan Nama Depan Anda"
@@ -174,20 +213,16 @@ const FormProfile = () => {
             <p className="text-red-500">{validationErrors.first_name}</p>
           )}
         </div>
-        <div className="mb-4">
-          <label
-            htmlFor="last_name"
-            className="block text-gray-700 font-bold mb-2"
-          >
-            Nama Belakang:
-          </label>
+
+        <div className="mb-4 relative">
+          <BiSolidUser className="absolute left-3 top-2 h-5 w-5 text-gray-500" />
           <input
             type="text"
             id="last_name"
             name="last_name"
             value={editedUser.last_name}
             readOnly={!isEditing}
-            className={`border rounded w-full py-2 px-3 ${
+            className={`border rounded pl-10 w-full py-2 px-3 ${
               validationErrors.last_name ? "border-red-500" : ""
             }`}
             placeholder="Masukkan Nama Belakang Anda"
@@ -215,26 +250,22 @@ const FormProfile = () => {
         ) : (
           <button
             className="rounded py-2 px-3 mb-2 text-red-700 border-2 border-red-800 font-semibold hover:border-red-400"
-            style={{width:"100%"}}
+            style={{ width: "100%" }}
             onClick={handleEdit}
           >
             Edit Profile
           </button>
         )}
+        <button
+          className="rounded py-2 px-3 text-white bg-red-500 hover:bg-red-800 font-semibold mt-2"
+          style={{ width: "100%" }}
+          onClick={handleLogout}
+        >
+          Logout
+        </button>
       </form>
-      <button
-        className="rounded  py-2 px-3 text-white bg-red-500 hover:bg-red-800 font-semibold mt-2"
-        style={{width:"33%"}}
-        onClick={handleLogout}
-      >
-        Logout
-      </button>
     </div>
   );
 };
 
 export default FormProfile;
-
-
-
-

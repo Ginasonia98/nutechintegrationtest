@@ -2,9 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import ProfilePhoto from "../../assets/image/ProfilePhoto.png";
 
-const NameCard = (props) => {
-  const { name } = props;
-  
+const NameCard = ({ name }) => {
   return (
     <div className="flex items-center justify-center md:justify-start">
       <div className="md:flex md:items-center md:space-x-4">
@@ -15,7 +13,9 @@ const NameCard = (props) => {
         />
         <div>
           <p className="text-black text-center md:text-left">Welcome,</p>
-          <h1 className="text-3xl font-semibold text-center md:text-left">{name}</h1>
+          <h1 className="text-3xl font-semibold text-center md:text-left">
+            {name}
+          </h1>
         </div>
       </div>
     </div>
@@ -23,8 +23,9 @@ const NameCard = (props) => {
 };
 
 NameCard.propTypes = {
-  name: PropTypes.string,
+  name: PropTypes.string, // Make 'name' prop optional
 };
 
 export default NameCard;
+
 
